@@ -28,7 +28,7 @@ def extract_title(article):
 
 def create_infobox_dic():
     articles = open_wiki_articles()
-    entity_dic = {}
+    entity_list = {}
     infobox_dic = {}
     name = ""
     value = ""
@@ -41,7 +41,7 @@ def create_infobox_dic():
             article_title = extract_title(text)
             # create dic with all linked entities from infobox
             if infobox:
-                entity_dic = {}
+                entity_list = {}
                 for i in range(1, len(infobox[0].params)):
                     if '[[' in infobox[0].params[i].value:
                         # clear name and value
@@ -49,11 +49,10 @@ def create_infobox_dic():
                         value = str(infobox[0].params[i].value)
                         name = name.replace('\n', '').replace(' ', '')
                         value = value.replace('\n', '').replace(' ', '')
-                        entity_dic.update({name: value})
+                        entity_list.update({name: value})
                 # infobox_dic = {title: {name:value},...}
-                infobox_dic.update({article_title: entity_dic})
+                infobox_dic.update({article_title: entity_list})
                 infobox_file.write(str(infobox_dic) + '\n')
-                entity_dic = {}
     return path
 
 

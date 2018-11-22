@@ -13,6 +13,7 @@ with open(
         triple_line = triple_f.readline()
         #triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
 
+        df = pd.DataFrame(columns=['Article', 'Entity', 'Sentence'])
 
         while infobox_f_line and triple_line:
             #print(infobox_f_line)
@@ -21,18 +22,25 @@ with open(
             triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
             if article == triple_article:
                 print('Article match: ', article)
-                #while article == triple_article:
-                #    entity = eval(infobox_f_line)
-                #    print(entity)
-                 #   triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
-                #    if triple_entity == entity:
-                #        print('nothing')
-
-
+                infobox_dic = eval(infobox_f_line)
+                infobox_entity_list = list(infobox_dic[article])
+                while article == triple_article:
+                    triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
+                    print('Triple Entity: ', triple_entity)
+                    print('Infobox Entity: ', infobox_dic[article][infobox_entity_list[0]])
+                    print('test')
+                    if triple_entity in infobox_dic[article][infobox_entity_list[0]]:
+                        df = df.append({'Article': article, 'Entity': triple_entity, 'Sentence': triple_line.replace('>', '/').split('/')[10]}, ignore_index=True)
+                        infobox_entity_list.pop(0)
+                        triple_line = triple_f.readline()
+                    else:
+                        triple_line = triple_f.readline()
+                # fix für article rotating
                 infobox_f_line = infobox_f.readline()
                 triple_line = triple_f.readline()
             else:
                 triple_line = triple_f.readline()
+        print(df)
 
 
 
