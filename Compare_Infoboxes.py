@@ -1,5 +1,7 @@
 import Extract_Infobox
 import pandas as pd
+import datetime
+import re
 
 infobox_path = Extract_Infobox.create_infobox_dic()
 with open(
@@ -9,106 +11,36 @@ with open(
         df = pd.DataFrame(columns=['Article', 'Entity',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
         infobox_f_line = infobox_f.readline()
-        #article = list(infobox_f_line.keys())[0]
         triple_line = triple_f.readline()
-        #triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
+        triple_file = triple_f.read()
 
         df = pd.DataFrame(columns=['Article', 'Entity', 'Sentence'])
 
         while infobox_f_line and triple_line:
-            #print(infobox_f_line)
             article = list(eval(infobox_f_line).keys())[0]
-            #print(article)
             triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
             if article == triple_article:
                 print('Article match: ', article)
-                infobox_dic = eval(infobox_f_line)
-                infobox_entity_list = list(infobox_dic[article])
+                infobox_entity_list = list(eval(infobox_f_line)[article])
                 while article == triple_article:
                     triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
                     print('Triple Entity: ', triple_entity)
-                    print('Infobox Entity: ', infobox_dic[article][infobox_entity_list[0]])
-                    print('test')
-                    if triple_entity in infobox_dic[article][infobox_entity_list[0]]:
-                        df = df.append({'Article': article, 'Entity': triple_entity, 'Sentence': triple_line.replace('>', '/').split('/')[10]}, ignore_index=True)
+                    print('Infobox Entity: ', eval(infobox_f_line)[article][infobox_entity_list[0]])
+                    if triple_entity in eval(infobox_f_line)[article][infobox_entity_list[0]]:
+                        df = df.append({'Article': article, 'Entity': triple_entity,
+                                        'Sentence': triple_line.replace('>', '/').split('/')[10]}, ignore_index=True)
+                        df.to_csv(
+                            r'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
+                                datetime.datetime.now().month) + str(
+                                datetime.datetime.now().day) + 'infobox_matches.csv', index=False)
                         infobox_entity_list.pop(0)
                         triple_line = triple_f.readline()
                     else:
                         triple_line = triple_f.readline()
-                # fix für article rotating
+                    triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
+                # back to article rotating
                 infobox_f_line = infobox_f.readline()
                 triple_line = triple_f.readline()
             else:
                 triple_line = triple_f.readline()
-        print(df)
-
-
-
-
-        # while infobox_f_line:
-        #     article = list(eval(infobox_f_line).keys())[0]
-        #     triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-        #     print(article)
-        #     if article == triple_article:
-        #         print('Article: ', article)
-        #     infobox_f_line = infobox_f.readline()
-        #     print(infobox_f_line)
-        #     triple_line = triple_f.readline()
-
-
-
-        #triple_line = triple_f.readline()
-        #triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-
-    # while triple_line:
-    #     triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-    #     for article in entity_dic:
-    #         while article == triple_article:
-    #             print('Article :', article)
-    # for entity in entity_dic[article]:
-    # print('Entity: ', entity)
-# article = ""
-# triple_line = triple_line = triple_f.readline()
-# triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-# for article in entity_dic:
-#     while article == triple_article:
-#         print('Article ', article)                triple_line = triple_line = triple_f.readline()
-#         triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-# triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
-# for entity in entity_dic[article]:
-# if triple_entity in entity_dic[article][entity]:
-
-
-# endlosscheife
-# for article, entity in entity_dic.items():
-#     print('Article: ', article)
-#     print('Entity: ', entity)
-
-# for entity in entity_dic[article]:
-#    print('Entity ', entity)
-# while article == triple_article:
-# print(article, ': Artikel gefunden')
-# triple_line = triple_line = triple_f.readline()
-# triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-# break
-
-#     while triple_line:
-#         for article in entity_dic:
-#             #triple_line = triple_f.readline()
-#             triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-#             while article == triple_article: # if article == triple_article:
-#                 print(article, ': Artikel gefunden')
-#                 triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
-#                 for entity in entity_dic[article]:
-#                     if triple_entity in entity_dic[article][entity]:
-#                         print(triple_entity, ': Entity gefunden ')
-#                         df = df.append({'Article': article, 'Entity': triple_entity,
-#                                         'Sentence': triple_line.replace('>', '/').split('/')[10]}, ignore_index=True)
-#                     triple_line = triple_f.readline()
-#                     triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
-#                 break
-# print(df)
-#
-# for line in triple_file:
-#     for article in entity_dic:
-#         print(article)
+print(df)
