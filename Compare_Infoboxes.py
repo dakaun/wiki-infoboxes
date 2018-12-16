@@ -90,5 +90,5 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
             index_co = df_comp.index[df_comp['article'] == article].tolist()[0]
             df_comp.loc[index_co, 'amount_link_article_match'] = value_link_match_counter
             infobox_f_line = infobox_f.readline()
-df.to_csv(result_path, sep=';', index=False, encoding='cp65001')
-df_comp.to_csv(comp_path, sep=';', index=False, encoding='cp65001') #todo encoding anpassen
+df.to_csv(result_path, sep=';', index=False)
+df_comp.to_csv(comp_path, sep=';', index=False) #todo encoding anpassen
