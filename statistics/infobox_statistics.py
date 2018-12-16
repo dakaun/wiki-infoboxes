@@ -2,9 +2,12 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser()
-#todo implement argparse
+parser.add_argument('-comp_path', help='Path to result file which contains all counter information')
+args = parser.parse_args()
+path = args.comp_path
+# path= '../../../comp/1216_info_comp.csv'
 
-data = pd.read_csv('../../../comp/1216_info_comp.csv', sep=';')
+data = pd.read_csv(path , sep=';')
 sum_amount_values = data['amount_values'].sum(0)
 sum_amount_entities = data['amount_entities'].sum(0)
 sum_amount_links = data['amount_links'].sum(0)
