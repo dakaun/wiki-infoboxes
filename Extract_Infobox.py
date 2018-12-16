@@ -9,8 +9,7 @@ import pandas as pd
 def open_wiki_articles(path):
     article = ""
     article_list = []
-    with open(path,
-              encoding='cp65001') as articles_raw:
+    with open(path) as articles_raw:
         articles_line = articles_raw.readline()
         while articles_line:
             article += articles_line
