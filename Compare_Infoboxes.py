@@ -2,6 +2,7 @@ import Extract_Infobox
 import pandas as pd
 import datetime
 import re
+import argparse
 
 
 # get articles (as concatenated string) from the triple file matching with the infobox article name
@@ -21,18 +22,33 @@ def get_article_triple_file(article_name, t_file):
     return article_as_string
 
 
+parser = argparse.ArgumentParser(description='Extract infoboxes from articles and create csv file with infobox entities '
+                                            'which contain a link + csv file which counts entites')
+parser.add_argument('-xml_path', help='Path to xml dump')
+parser.add_argument('-info_path', help='Path to infobox file')
+parser.add_argument('-wiki_triple', help='Path to wiki_triple file (result from wiki_crawler')
+parser.add_argument('-result', help='Path to result file which contains all infobox information')
+parser.add_argument('-comp', help='Path to result file which contains all counter information')
+args = parser.parse_args()
+
+wikixml_path = args.xml_path
+infobox_path = args.info_path
+wikitriple_path = args.wiki_triple
+result_path = args.result
+comp_path = args.comp
+
 # PATHES:
-wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
-infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
-    datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+# wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
+# infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
+#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+#
+# wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
+# result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
+#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox_matches(long).csv'
+# comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/' + str(
+#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_info_comp.csv'
 
-wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
-result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
-    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox_matches(long).csv'
-comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/' + str(
-    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_info_comp.csv'
-
-df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_links', 'amount_link_article_match'])
+df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_entities', 'amount_links', 'amount_link_article_match'])
 
 infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
 with open(wikitriple_path, encoding='cp65001') as triple_f:
@@ -45,14 +61,14 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
             article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
             article_from_triple = get_article_triple_file(article,
                                                           triple_f)  # continue only if article could be found in the triple file
+            value_link_match_counter = 0
             if article_from_triple:
-                value_link_match_counter = 0 
                 infobox_value_list = list(eval(infobox_f_line)[article])
                 while infobox_value_list:
-                    plain_infobox_entity = eval(infobox_f_line)[article][
+                    plain_infobox_value = eval(infobox_f_line)[article][
                         infobox_value_list[0]]  # first infobox entity value out of list
                     entities_re = re.findall(r'(\[\[.*?\]\])',
-                                             plain_infobox_entity)  # get entity out of infobox entity value
+                                             plain_infobox_value)  # get entity out of infobox entity value
                     #  if several entities are combined in one infobox entity value
                     for infobox_entity in entities_re:
                         infobox_entity = infobox_entity.replace('[[', '').replace(']]', '')
@@ -75,4 +91,4 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
             df_comp.loc[index_co, 'amount_link_article_match'] = value_link_match_counter
             infobox_f_line = infobox_f.readline()
 df.to_csv(result_path, sep=';', index=False, encoding='cp65001')
-df_comp.to_csv(comp_path, sep=';', index=False, encoding='cp65001')
+df_comp.to_csv(comp_path, sep=';', index=False, encoding='cp65001') #todo encoding anpassen
