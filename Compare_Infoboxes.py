@@ -3,7 +3,10 @@ import pandas as pd
 import datetime
 import re
 
+
+# get articles (as concatenated string) from the triple file matching with the infobox article name
 def get_article_triple_file(article_name, t_file):
+    t_file.seek(0)
     article_as_string = ""
     article_name = article_name.replace(' ', '_')
     t_line = t_file.readline()
@@ -17,92 +20,59 @@ def get_article_triple_file(article_name, t_file):
             t_line = t_file.readline()
     return article_as_string
 
-infobox_path = Extract_Infobox.create_infobox_dic()
-with open(
-        r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\short\wiki_triples(short).txt',
-        encoding='cp65001') as triple_f:
-    with open(infobox_path) as infobox_f:
-        df = pd.DataFrame(columns=['Article', 'Entity',
-                                   'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
-        # article_from_triple = ""
 
-        #triple_file = triple_f.read()
+# PATHES:
+wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
+infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
+    datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+
+wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
+result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
+    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox_matches(long).csv'
+comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/' + str(
+    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_info_comp.csv'
+
+df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_links', 'amount_link_article_match'])
+
+infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
+with open(wikitriple_path, encoding='cp65001') as triple_f:
+    with open(infobox_path) as infobox_f:
+        df = pd.DataFrame(columns=['Article','Infobox_value' ,'Entity',
+                                   'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
+        # iterate through infoboxes
         infobox_f_line = infobox_f.readline()
         while infobox_f_line:
-            article = list(eval(infobox_f_line).keys())[0]
-            article_from_triple = get_article_triple_file(article, triple_f)
-            # print(article_from_triple)
-            infobox_entity_list = list(eval(infobox_f_line)[article])
-            while infobox_entity_list:
-                plain_infobox_entity = eval(infobox_f_line)[article][infobox_entity_list[0]]#.replace('[[', '').replace(']]', '') # TODO not replace, but regex to get more than one entity
-                entities_re = re.findall(r'(\[\[.*?\]\])', plain_infobox_entity)
-                for infobox_entity in entities_re:
-                    infobox_entity = infobox_entity.replace('[[', '').replace(']]', '')
-                    if "|" in infobox_entity:
-                        infobox_entity = re.match(r'(.*?)(\|)', infobox_entity)
-                        infobox_entity = infobox_entity.group().replace('|', '')
-                    infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
-                    match_re = re.search(r'(<.*/' + infobox_entity_undsco + '>).*', article_from_triple)
-                    if match_re:
-                        match = match_re.group()
-                        df = df.append({'Article': article, 'Entity': infobox_entity_undsco.replace('_', ' '), 'Sentence': match.replace('>', '/').split('/')[10]}, ignore_index=True)
-                        print(df)
-                infobox_entity_list.pop(0)
+            article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
+            article_from_triple = get_article_triple_file(article,
+                                                          triple_f)  # continue only if article could be found in the triple file
+            if article_from_triple:
+                value_link_match_counter = 0 
+                infobox_value_list = list(eval(infobox_f_line)[article])
+                while infobox_value_list:
+                    plain_infobox_entity = eval(infobox_f_line)[article][
+                        infobox_value_list[0]]  # first infobox entity value out of list
+                    entities_re = re.findall(r'(\[\[.*?\]\])',
+                                             plain_infobox_entity)  # get entity out of infobox entity value
+                    #  if several entities are combined in one infobox entity value
+                    for infobox_entity in entities_re:
+                        infobox_entity = infobox_entity.replace('[[', '').replace(']]', '')
+                        if "|" in infobox_entity:  # if shadowing
+                            infobox_entity = re.match(r'(.*?)(\|)', infobox_entity)
+                            infobox_entity = infobox_entity.group().replace('|', '')
+                        #infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
+                        infobox_entity_undsco = infobox_entity.replace(' ', '_')
+                        match_re = re.search(r'(<.*/' + infobox_entity_undsco + '>).*', article_from_triple,
+                                             re.IGNORECASE)
+                        if match_re:
+                            value_link_match_counter += 1
+                            match = match_re.group()
+                            df = df.append({'Article': article, 'Infobox_value': infobox_value_list[0],
+                                            'Entity': infobox_entity_undsco.replace('_', ' '),
+                                            'Sentence': match.replace('>', '/').split('/')[10]},
+                                           ignore_index=True)
+                    infobox_value_list.pop(0)
+            index_co = df_comp.index[df_comp['article'] == article].tolist()[0]
+            df_comp.loc[index_co, 'amount_link_article_match'] = value_link_match_counter
             infobox_f_line = infobox_f.readline()
-        print(df)
-df.to_csv(r'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox_matches.csv', index=False)
-        #
-
-                # TODO run file
-                # TODO compare with last version
-                # TODO case: several entities in infobox entity
-
-
-
-
-
-
-
-
-
-
-
-#         infobox_f_line = infobox_f.readline()
-#         triple_line = triple_f.readline()
-#         triple_file = triple_f.read()
-#
-#         df = pd.DataFrame(columns=['Article', 'Entity', 'Sentence'])
-#
-#         while infobox_f_line and triple_line:
-#             article = list(eval(infobox_f_line).keys())[0]
-#             triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-#             if article == triple_article:
-#                 print('Article match: ', article)
-#                 infobox_entity_list = list(eval(infobox_f_line)[article])
-#                 while article == triple_article:
-#                     triple_entity = triple_line.replace('>', '/').split('/')[9].replace('_', '')
-#                     print('Triple Entity: ', triple_entity)
-#                     print('Infobox Entity: ', eval(infobox_f_line)[article][infobox_entity_list[0]])
-#                     # check if infobox entity is in triple file, otherwise take next infobox entity
-#                     entity = re.search(r'/' + triple_entity + '>', triple_file)
-#                     if entity:
-#                         if triple_entity in eval(infobox_f_line)[article][infobox_entity_list[0]]:
-#                             df = df.append({'Article': article, 'Entity': triple_entity,
-#                                             'Sentence': triple_line.replace('>', '/').split('/')[10]}, ignore_index=True)
-#                             df.to_csv(
-#                                 r'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
-#                                     datetime.datetime.now().month) + str(
-#                                     datetime.datetime.now().day) + 'infobox_matches.csv', index=False)
-#                             infobox_entity_list.pop(0)
-#                             triple_line = triple_f.readline()
-#                         else:
-#                             triple_line = triple_f.readline()
-#                         triple_article = triple_line.replace('>', '/').split('/')[4].replace('_', ' ')
-#                     else:
-#                         infobox_entity_list.pop(0)
-#                 # back to article rotating
-#                 infobox_f_line = infobox_f.readline()
-#                 triple_line = triple_f.readline()
-#             else:
-#                 triple_line = triple_f.readline()
-# print(df)
+df.to_csv(result_path, sep=';', index=False, encoding='cp65001')
+df_comp.to_csv(comp_path, sep=';', index=False, encoding='cp65001')
