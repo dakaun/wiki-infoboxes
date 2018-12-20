@@ -53,7 +53,7 @@ df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_entities', '
 infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
 with open(wikitriple_path) as triple_f:
     with open(infobox_path) as infobox_f:
-        df = pd.DataFrame(columns=['Article','Infobox_value' ,'Entity',
+        df = pd.DataFrame(columns=['Article','Infobox_property' ,'Entity',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
         print('-- Start to compare the Infoboxes')
         # iterate through infoboxes
