@@ -47,6 +47,7 @@ def create_infobox_dic(wikiarticle_path, infobox_path, df):
             article_title = extract_title(article)
             # create dic with all linked entities from infobox
             if infobox:
+                print('-- Processing article : ' + article_title)
                 entity_list = {}
                 amount_info_values = len(infobox[0].params)
                 for i in range(0, amount_info_values):
