@@ -62,7 +62,7 @@ with open(wikitriple_path) as triple_f:
             article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
             article_from_triple = get_article_triple_file(article,
                                                           triple_f)  # continue only if article could be found in the triple file
-            print('-- Processing infobox: article')
+            print('-- Processing infobox: ' + article)
             value_link_match_counter = 0
             if article_from_triple:
                 infobox_value_list = list(eval(infobox_f_line)[article])
