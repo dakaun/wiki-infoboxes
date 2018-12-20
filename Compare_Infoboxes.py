@@ -55,6 +55,7 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
     with open(infobox_path) as infobox_f:
         df = pd.DataFrame(columns=['Article','Infobox_value' ,'Entity',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
+        print('-- Start to compare the Infoboxes')
         # iterate through infoboxes
         infobox_f_line = infobox_f.readline()
         while infobox_f_line:
@@ -82,7 +83,7 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
                         if match_re:
                             value_link_match_counter += 1
                             match = match_re.group()
-                            df = df.append({'Article': article, 'Infobox_value': infobox_value_list[0],
+                            df = df.append({'Article': article, 'Infobox_property': infobox_value_list[0],
                                             'Entity': infobox_entity_undsco.replace('_', ' '),
                                             'Sentence': match.replace('>', '/').split('/')[10]},
                                            ignore_index=True)

@@ -36,6 +36,7 @@ def create_infobox_dic(wikiarticle_path, infobox_path, df):
     value = ""
     #infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
     with open(infobox_path, 'w+') as infobox_file:
+        print('-- Extracting infoboxes')
         for article in articles:
             infobox_dic = {}
             link_counter = 0
@@ -64,6 +65,7 @@ def create_infobox_dic(wikiarticle_path, infobox_path, df):
                 infobox_dic.update({article_title: entity_list})
                 infobox_file.write(str(infobox_dic) + '\n')
             df = df.append({'article': article_title, 'amount_values': amount_info_values, 'amount_entities': infobox_value_counter, 'amount_links': link_counter}, ignore_index=True)
+    ('-- Infoboxes extracted and saved in infobox_file')
     return infobox_path, df
 
 
