@@ -51,7 +51,7 @@ comp_path = args.comp
 df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_entities', 'amount_links', 'amount_link_article_match'])
 
 infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
-with open(wikitriple_path, encoding='cp65001') as triple_f:
+with open(wikitriple_path) as triple_f:
     with open(infobox_path) as infobox_f:
         df = pd.DataFrame(columns=['Article','Infobox_value' ,'Entity',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
@@ -62,6 +62,7 @@ with open(wikitriple_path, encoding='cp65001') as triple_f:
             article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
             article_from_triple = get_article_triple_file(article,
                                                           triple_f)  # continue only if article could be found in the triple file
+            print('-- Processing infobox: article')
             value_link_match_counter = 0
             if article_from_triple:
                 infobox_value_list = list(eval(infobox_f_line)[article])
