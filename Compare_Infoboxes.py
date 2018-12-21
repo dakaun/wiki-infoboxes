@@ -51,7 +51,7 @@ comp_path = args.comp
 df_comp = pd.DataFrame(columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
 
 infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
-with open(wikitriple_path) as triple_f:
+with open(wikitriple_path) as triple_f: #, encoding='cp65001'
     with open(infobox_path) as infobox_f:
         df = pd.DataFrame(columns=['Article','Infobox_property' ,'Entity',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
