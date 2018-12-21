@@ -48,7 +48,7 @@ comp_path = args.comp
 # comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/' + str(
 #     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_info_comp.csv'
 
-df_comp = pd.DataFrame(columns=['article', 'amount_values', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+df_comp = pd.DataFrame(columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
 
 infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
 with open(wikitriple_path) as triple_f:
