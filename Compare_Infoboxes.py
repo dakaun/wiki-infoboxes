@@ -63,7 +63,7 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
             article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
             article_from_triple = get_article_triple_file(article,
                                                           triple_f)  # continue only if article could be found in the triple file
-            print('-- Processing infobox: ' + article)
+            # print('-- Processing infobox: ' + article)
             value_link_match_counter = 0
             if article_from_triple:
                 infobox_value_list = list(eval(infobox_f_line)[article])
@@ -80,6 +80,7 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
                             infobox_entity = infobox_entity.group().replace('|', '')
                         # infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
                         infobox_entity_undsco = infobox_entity.replace(' ', '_')
+                        print('-- Processing infobox: ' + article + ' with entity: ' + infobox_entity_undsco)
                         match_re = re.search(r'\(<.*/' + infobox_entity_undsco + '>\).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
                                              re.IGNORECASE)
                         if match_re:
