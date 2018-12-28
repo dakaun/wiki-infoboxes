@@ -4,7 +4,7 @@ import mwparserfromhell
 import datetime
 import pandas as pd
 import fileinput
-
+import csv
 
 # todo insert print statements
 
@@ -58,9 +58,11 @@ def parse_infobox(infobox, title, infofile):
     return title, amount_info_values, infobox_value_counter, link_counter
 
 
-def create_infobox_dic(wikiarticle_path, infobox_path, df):
+def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
     # wikiarticle_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
     # infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+    df = pd.DataFrame(
+        columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
     article = ""
     infobox_file = open(infobox_path, 'w+')
     print('-- Extracting infoboxes')
@@ -79,8 +81,10 @@ def create_infobox_dic(wikiarticle_path, infobox_path, df):
                      'amount_links': counter3}, ignore_index=True)
             # end of processing infobox
             article = ""
+    df.to_csv(comp_path, sep=';', index=False)
+    #csv.writer(df, delimiter= ';')
     print('-- Infoboxes extracted and saved in infobox_file')
-    return infobox_path, df
+    return df
 
 
 if __name__ == '__main__':
