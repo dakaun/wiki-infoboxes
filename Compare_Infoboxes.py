@@ -54,7 +54,7 @@ df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, comp_pa
 # df_comp = pd.read_csv(comp_path, encoding='cp65001')  # TODO fix pandas.errors.ParserError: Error tokenizing data. C error: Expected 1 fields in line 7, saw 2
 with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
     with open(infobox_path) as infobox_f:
-        df = pd.DataFrame(columns=['Article', 'Infobox_property', 'Entity',
+        df = pd.DataFrame(columns=['Article', 'Infobox_property', 'Link',
                                    'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
         print('-- Start to compare the Infoboxes')
         # iterate through infoboxes
@@ -80,13 +80,13 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
                             infobox_entity = infobox_entity.group().replace('|', '')
                         # infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
                         infobox_entity_undsco = infobox_entity.replace(' ', '_')
-                        match_re = re.search(r'(<.*/' + infobox_entity_undsco + '>).*', article_from_triple,
+                        match_re = re.search(r'\(<.*/' + infobox_entity_undsco + '>\).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
                                              re.IGNORECASE)
                         if match_re:
                             value_link_match_counter += 1
                             match = match_re.group()
                             df = df.append({'Article': article, 'Infobox_property': infobox_value_list[0],
-                                            'Entity': infobox_entity_undsco.replace('_', ' '),
+                                            'Link': infobox_entity_undsco.replace('_', ' '),
                                             'Sentence': match.replace('>', '/').split('/')[10]},
                                            ignore_index=True)
                     infobox_value_list.pop(0)
