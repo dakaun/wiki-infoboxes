@@ -1,96 +1,116 @@
-import Extract_Infobox
-import pandas as pd
-import datetime
+
 import re
-import argparse
+# from lxml import etree # try to parse
+import mwparserfromhell
+import datetime
+import pandas as pd
+import fileinput
+from multiprocessing import cpu_count, Pool
 
 
-# get articles (as concatenated string) from the triple file matching with the infobox article name
-def get_article_triple_file(article_name, t_file):
-    t_file.seek(0)
-    article_as_string = ""
-    article_name = article_name.replace(' ', '_')
-    t_line = t_file.readline()
-    while t_line:
-        if article_name in t_line:
-            article_as_string += t_line
-            t_line = t_file.readline()
-        elif article_as_string:
-            break
-        else:
-            t_line = t_file.readline()
-    return article_as_string
+# todo insert print statements
+
+def open_wiki_articles(input_path):
+    article = ""
+    article_list = []
+    input = fileinput.FileInput(input_path)
+    for line in input:
+        while line:
+            article += line
+            if '</page>' in line:
+                article_list.append(article)
+                article = ""
+    return article_list
 
 
-parser = argparse.ArgumentParser(description='Extract infoboxes from articles and create csv file with infobox entities '
-                                            'which contain a link + csv file which counts entites')
-parser.add_argument('-xml_path', help='Path to xml dump')
-parser.add_argument('-info_path', help='Path to infobox file')
-parser.add_argument('-wiki_triple', help='Path to wiki_triple file (result from wiki_crawler')
-parser.add_argument('-result', help='Path to result file which contains all infobox information')
-parser.add_argument('-comp', help='Path to result file which contains all counter information')
-args = parser.parse_args()
+def extract_title(article):
+    re_title = re.search(r'<title>.*?</title>', article)
+    group_title = re_title.group()
+    title = group_title.replace('<', '>').split('>')
+    return title[2]
 
-wikixml_path = args.xml_path
-infobox_path = args.info_path
-wikitriple_path = args.wiki_triple
-result_path = args.result
-comp_path = args.comp
 
-# PATHES:
-# wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
-# infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
-#
-# wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
-# result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/result_match/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox_matches(long).csv'
-# comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_info_comp.csv'
+def parse_infobox(infobox, title):
+    infobox_value_counter = 0
+    link_counter = 0
+    amount_info_values = 0
+    entity_list = {}
+    infobox_dic = {}
+    name = ""
+    value = ""
 
-df_comp = pd.DataFrame(columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+    print('-- Processing article : ' + title)
+    amount_info_values = len(infobox[0].params)
+    for i in range(0, amount_info_values):
+        # counts all infobox names with content (not only those which contain a link)
+        if re.match('[^\\n]', str(infobox[0].params[
+                                      i].value)) is not None:  # todo could be enhanced by searching for any charachter except \n, }},|
+            infobox_value_counter += 1
+        if '[[' in infobox[0].params[i].value:
+            link_counter += 1
+            # clear name and value
+            name = str(infobox[0].params[i].name)
+            value = str(infobox[0].params[i].value)
+            name = name.replace('\n', ' ')
+            value = value.replace('\n', ' ')
+            entity_list.update({name: value})
+    # infobox_dic = {title: {name:value},...}
+    infobox_dic.update({title: entity_list})
+    # infofile.write(str(infobox_dic) + '\n')
+    infoboxdic_line = str(infobox_dic) + '\n'
+    return title, amount_info_values, infobox_value_counter, link_counter, infoboxdic_line
 
-infobox_path, df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, df_comp)
-with open(wikitriple_path) as triple_f: #, encoding='cp65001'
-    with open(infobox_path) as infobox_f:
-        df = pd.DataFrame(columns=['Article','Infobox_property' ,'Entity',
-                                   'Sentence'])  # contains articles with infoboxes, and those entities which are links and were found in the article as links
-        print('-- Start to compare the Infoboxes')
-        # iterate through infoboxes
-        infobox_f_line = infobox_f.readline()
-        while infobox_f_line:
-            article = list(eval(infobox_f_line).keys())[0]  # get first article of the infoboxes
-            article_from_triple = get_article_triple_file(article,
-                                                          triple_f)  # continue only if article could be found in the triple file
-            print('-- Processing infobox: ' + article)
-            value_link_match_counter = 0
-            if article_from_triple:
-                infobox_value_list = list(eval(infobox_f_line)[article])
-                while infobox_value_list:
-                    plain_infobox_value = eval(infobox_f_line)[article][
-                        infobox_value_list[0]]  # first infobox entity value out of list
-                    entities_re = re.findall(r'(\[\[.*?\]\])',
-                                             plain_infobox_value)  # get entity out of infobox entity value
-                    #  if several entities are combined in one infobox entity value
-                    for infobox_entity in entities_re:
-                        infobox_entity = infobox_entity.replace('[[', '').replace(']]', '')
-                        if "|" in infobox_entity:  # if shadowing
-                            infobox_entity = re.match(r'(.*?)(\|)', infobox_entity)
-                            infobox_entity = infobox_entity.group().replace('|', '')
-                        #infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
-                        infobox_entity_undsco = infobox_entity.replace(' ', '_')
-                        match_re = re.search(r'(<.*/' + infobox_entity_undsco + '>).*', article_from_triple,
-                                             re.IGNORECASE)
-                        if match_re:
-                            value_link_match_counter += 1
-                            match = match_re.group()
-                            df = df.append({'Article': article, 'Infobox_property': infobox_value_list[0],
-                                            'Entity': infobox_entity_undsco.replace('_', ' '),
-                                            'Sentence': match.replace('>', '/').split('/')[10]},
-                                           ignore_index=True)
-                    infobox_value_list.pop(0)
-            index_co = df_comp.index[df_comp['article'] == article].tolist()[0]
-            df_comp.loc[index_co, 'amount_link_article_match'] = value_link_match_counter
-            infobox_f_line = infobox_f.readline()
-df.to_csv(result_path, sep=';', index=False)
-df_comp.to_csv(comp_path, sep=';', index=False) #todo encoding anpassen
+
+def pages_from(input):
+    article = ""
+    title = None
+
+    for line in input:
+        article += line
+        re_title = re.search(r'<title>.*?</title>', line)
+        if not re_title:
+            continue
+        title = re_title.group().replace('<', '>').split('>')[2]
+        if '</page>' in line:
+            yield (article, title)
+        article = ""
+        title = None
+
+
+
+def create_infobox_dic(wikiarticle_path, infobox_path, df):
+    # wikiarticle_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
+    # infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+    article = ""
+    infobox_file = open(infobox_path, 'w+')
+
+    print('-- Extracting infoboxes')
+    input = fileinput.FileInput(wikiarticle_path, openhook=fileinput.hook_encoded('cp65001'))  # hook_compressed hook_encoded('cp65001')
+    pool = Pool(processes=max(1, cpu_count() - 1))
+
+    for page_data in pages_from(input):
+        page, title = page_data
+        # start processing infobox
+        infobox = mwparserfromhell.parse(page).filter_templates(matches='Infobox .*')
+
+        if infobox:
+            for result in pool.apply(parse_infobox, args=(infobox, title)): # TODO implement multiprocessing
+                infobox_file.write(result[4])
+                # title, counter1, counter2, counter3 = parse_infobox(infobox, article_title, infobox_file)
+                df = df.append(
+                    {'article': result[0], 'amount_properties': result[1],
+                     'amount_entities': result[2],
+                     'amount_links': result[3]}, ignore_index=True)
+                # end of processing infobox
+    print('-- Infoboxes extracted and saved in infobox_file')
+    return infobox_path, df
+
+
+if __name__ == '__main__':
+    df_comp = pd.DataFrame(
+        columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+    path, df = create_infobox_dic(
+        'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
+        'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
+            datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt', df_comp)
+    print(df)
