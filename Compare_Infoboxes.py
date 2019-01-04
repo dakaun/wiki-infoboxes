@@ -81,8 +81,11 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
                         # infobox_entity_undsco = re.sub(r"(.)([A-Z])", r"\1_\2", infobox_entity)
                         infobox_entity_undsco = infobox_entity.replace(' ', '_')
                         print('-- Processing infobox: ' + article + ' with entity: ' + infobox_entity_undsco)
-                        match_re = re.search(r'\(<.*/' + infobox_entity_undsco + '>\).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
+                        try:
+                            match_re = re.search(r'\(<.*/' + infobox_entity_undsco + '>\).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
                                              re.IGNORECASE)
+                        except re.error as err:
+                            print('ERROR: ' + err)
                         if match_re:
                             value_link_match_counter += 1
                             match = match_re.group()
