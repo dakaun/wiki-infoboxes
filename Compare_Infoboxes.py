@@ -38,11 +38,11 @@ wikitriple_path = args.wiki_triple
 result_path = args.result
 comp_path = args.comp
 
-# # PATHES: 
+# # # PATHES:
 # wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
 # infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/infobox_file/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
-# 
+#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox.txt'
+#
 # wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
 # result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/result_infobox/' + str(
 #     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_result_infobox.csv'
@@ -82,7 +82,7 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
                         infobox_entity_undsco = infobox_entity.replace(' ', '_')
                         print('-- Processing infobox: ' + article + ' with entity: ' + infobox_entity_undsco)
                         try:
-                            match_re = re.search(r'\(<.*/' + infobox_entity_undsco + '>\).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
+                            match_re = re.search(r'(<.*/' + infobox_entity_undsco + '>).*', article_from_triple, # replace with if string in string ? - but how dealing with lower and upper case
                                              re.IGNORECASE)
                         except re.error as err:
                             print('ERROR: ' + str(err))
