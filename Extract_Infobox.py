@@ -67,7 +67,7 @@ def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
     infobox_file = open(infobox_path, 'w+')
     print('-- Extracting infoboxes')
     for line in fileinput.input(wikiarticle_path,
-                                openhook=fileinput.ook_compressed):  # hook_compressed hook_encoded('cp65001')
+                                openhook=fileinput.hook_compressed):  # hook_compressed hook_encoded('cp65001')
         article += line
         if '</page>' in line:
             # start processing infobox
