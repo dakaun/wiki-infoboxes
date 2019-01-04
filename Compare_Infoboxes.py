@@ -86,6 +86,8 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
                                              re.IGNORECASE)
                         except re.error as err:
                             print('ERROR: ' + str(err))
+                            print('ERROR PATTERN: ' + str(err.pattern))
+                            print('ERROR INDEX POSITION: ' + str(err.pos))
                         if match_re:
                             value_link_match_counter += 1
                             match = match_re.group()
