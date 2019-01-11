@@ -1,4 +1,3 @@
-
 import re
 # from lxml import etree # try to parse
 import mwparserfromhell
@@ -30,10 +29,9 @@ def extract_title(article):
     return title[2]
 
 
-def parse_infobox(infobox, title):
+def parse_infobox(infobox, title, infofile):
     infobox_value_counter = 0
     link_counter = 0
-    amount_info_values = 0
     entity_list = {}
     infobox_dic = {}
     name = ""
@@ -56,9 +54,9 @@ def parse_infobox(infobox, title):
             entity_list.update({name: value})
     # infobox_dic = {title: {name:value},...}
     infobox_dic.update({title: entity_list})
-    # infofile.write(str(infobox_dic) + '\n')
-    infoboxdic_line = str(infobox_dic) + '\n'
-    return title, amount_info_values, infobox_value_counter, link_counter, infoboxdic_line
+    infofile.write(str(infobox_dic) + '\n') # check ob das mit multiprocessing funtkioniert, oder ob das file immer wieder überschrieben wird...
+    #infoboxdic_line = str(infobox_dic) + '\n'
+    return amount_info_values, infobox_value_counter, link_counter
 
 
 def pages_from(input):
@@ -68,25 +66,27 @@ def pages_from(input):
     for line in input:
         article += line
         re_title = re.search(r'<title>.*?</title>', line)
+        if '</page>\n' in line:
+            yield (article, title)
+            article = ""
+            title = None
         if not re_title:
             continue
         title = re_title.group().replace('<', '>').split('>')[2]
-        if '</page>' in line:
-            yield (article, title)
-        article = ""
-        title = None
-
 
 
 def create_infobox_dic(wikiarticle_path, infobox_path, df):
     # wikiarticle_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
     # infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
-    article = ""
+    df = pd.DataFrame(columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+
     infobox_file = open(infobox_path, 'w+')
 
     print('-- Extracting infoboxes')
     input = fileinput.FileInput(wikiarticle_path, openhook=fileinput.hook_encoded('cp65001'))  # hook_compressed hook_encoded('cp65001')
-    pool = Pool(processes=max(1, cpu_count() - 1))
+
+    # TODO next try: try to implement Queue as in WikiExtractor
+
 
     for page_data in pages_from(input):
         page, title = page_data
@@ -94,23 +94,23 @@ def create_infobox_dic(wikiarticle_path, infobox_path, df):
         infobox = mwparserfromhell.parse(page).filter_templates(matches='Infobox .*')
 
         if infobox:
-            for result in pool.apply(parse_infobox, args=(infobox, title)): # TODO implement multiprocessing
-                infobox_file.write(result[4])
-                # title, counter1, counter2, counter3 = parse_infobox(infobox, article_title, infobox_file)
-                df = df.append(
-                    {'article': result[0], 'amount_properties': result[1],
-                     'amount_entities': result[2],
-                     'amount_links': result[3]}, ignore_index=True)
+            counter1, counter2, counter3 = parse_infobox(infobox, title, infobox_file)
+            df = df.append(
+                    {'article': title, 'amount_properties': counter1,
+                     'amount_entities': counter2,
+                     'amount_links': counter3}, ignore_index=True)
                 # end of processing infobox
+        page = None
     print('-- Infoboxes extracted and saved in infobox_file')
-    return infobox_path, df
+    return df # Todo write df to file?
 
 
 if __name__ == '__main__':
     df_comp = pd.DataFrame(
         columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
     path, df = create_infobox_dic(
-        'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
+        r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\data\wiki_dump_long_withoutsiteinfo.txt',
         'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
             datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt', df_comp)
     print(df)
+    #wikiarticlepath #'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
