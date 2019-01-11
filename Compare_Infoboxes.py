@@ -3,7 +3,7 @@ import pandas as pd
 import datetime
 import re
 import argparse
-
+import time
 
 # get articles (as concatenated string) from the triple file matching with the infobox article name
 def get_article_triple_file(article_name, t_file):
@@ -38,16 +38,18 @@ wikitriple_path = args.wiki_triple
 result_path = args.result
 comp_path = args.comp
 
+start = time.time()
 # # # PATHES:
-# wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
-# infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/infobox_file/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox.txt'
-#
-# wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
-# result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/result_infobox/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_result_infobox.csv'
-# comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/comp_infobox/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_comp.csv'
+#wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
+#infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/infobox_file/' + str(
+#    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infoboxfi.txt'
+
+#wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
+#result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/result_infobox/' + str(
+#    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_result_infoboxfi.csv'
+#comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/comp_infobox/' + str(
+#    datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_compfi.csv'
+
 
 # python Compare_Infoboxes.py -xml_path ../../data/wiki_dump_long.txt -info_path data/infobox_2812.txt -wiki_triple ../../test_wiki_ctawler/longer/wiki_triples.txt -result data/result_infobox/result_infobox_2812.csv -comp data/comp_infobox/comp_2812.csv
 df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, comp_path)
@@ -101,3 +103,4 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
             infobox_f_line = infobox_f.readline()
 df.to_csv(result_path, sep=';', index=False)
 df_comp.to_csv(comp_path, sep=';', index=False)  # todo encoding anpassen
+print(f'Time Tracking: {time.time()-start}')
