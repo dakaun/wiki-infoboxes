@@ -1,12 +1,20 @@
 import re
-# from lxml import etree # try to parse
 import mwparserfromhell
-import datetime
 import pandas as pd
 import fileinput
-import csv
+import argparse
 
-# todo insert print statements
+parser = argparse.ArgumentParser(
+    description='Extract infoboxes from articles and create csv file with infobox entities '
+                'which contain a link + csv file which counts entites')
+parser.add_argument('-xml_path', help='Path to xml dump')
+parser.add_argument('-info_path', help='Path to infobox file')
+parser.add_argument('-comp', help='Path to result file which contains all counter information')
+args = parser.parse_args()
+
+wikixml_path = args.xml_path
+infobox_path = args.info_path
+comp_path = args.comp
 
 def open_wiki_articles(input_path):
     article = ""
@@ -28,7 +36,7 @@ def extract_title(article):
     return title[2]
 
 
-def parse_infobox(infobox, title, infofile):
+def parse_infobox(infobox, title, df):
     infobox_value_counter = 0
     link_counter = 0
     amount_info_values = 0
@@ -36,7 +44,6 @@ def parse_infobox(infobox, title, infofile):
     infobox_dic = {}
     name = ""
     value = ""
-
     print('-- Processing article : ' + title)
     amount_info_values = len(infobox[0].params)
     for i in range(0, amount_info_values):
@@ -51,20 +58,16 @@ def parse_infobox(infobox, title, infofile):
             value = str(infobox[0].params[i].value)
             name = name.replace('\n', ' ')
             value = value.replace('\n', ' ')
-            entity_list.update({name: value})
-    # infobox_dic = {title: {name:value},...}
-    infobox_dic.update({title: entity_list})
-    infofile.write(str(infobox_dic) + '\n')
-    return title, amount_info_values, infobox_value_counter, link_counter
+            df = df.append({'article_title': title, 'infobox_property': name, 'infobox_value': value}, ignore_index=True)
+
+    return title, amount_info_values, infobox_value_counter, link_counter, df
 
 
-def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
-    # wikiarticle_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
-    # infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt'
+def create_infobox_dic(wikiarticle_path, comp_path):
     df = pd.DataFrame(
         columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+    df_info = pd.DataFrame(columns=['article_title', 'infobox_property', 'infobox_value'])
     article = ""
-    infobox_file = open(infobox_path, 'w+')
     print('-- Extracting infoboxes')
     for line in fileinput.input(wikiarticle_path,
                                 openhook=fileinput.hook_compressed):  # hook_compressed hook_encoded('cp65001')
@@ -74,7 +77,7 @@ def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
             infobox = mwparserfromhell.parse(article).filter_templates(matches='Infobox .*')
             article_title = extract_title(article)
             if infobox:
-                title, counter1, counter2, counter3 = parse_infobox(infobox, article_title, infobox_file)
+                title, counter1, counter2, counter3, df_info= parse_infobox(infobox, article_title, df_info)
                 df = df.append(
                     {'article': title, 'amount_properties': counter1,
                      'amount_entities': counter2,
@@ -82,16 +85,18 @@ def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
             # end of processing infobox
             article = ""
     df.to_csv(comp_path, sep=';', index=False)
-    #csv.writer(df, delimiter= ';')
     print('-- Infoboxes extracted and saved in infobox_file')
-    return df
+    return df_info
+
 
 
 if __name__ == '__main__':
-    df_comp = pd.DataFrame(
-        columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
-    path, df = create_infobox_dic(
-        'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
-        'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
-            datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt', df_comp)
-    print(df)
+    df = create_infobox_dic(wikixml_path, comp_path)
+    df.to_csv(infobox_path, sep=';', index=False)
+    # df_comp = pd.DataFrame(
+    #    columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
+    #path, df = create_infobox_dic(
+    #    'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
+    #    'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
+    #        datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt', df_comp)
+    #print(df)
