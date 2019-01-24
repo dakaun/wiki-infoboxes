@@ -22,19 +22,17 @@ def get_article_triple_file(article_name, t_file):
     return article_as_string
 
 
-parser = argparse.ArgumentParser(
-    description='Extract infoboxes from articles and create csv file with infobox entities '
-                'which contain a link + csv file which counts entites')
-parser.add_argument('-xml', help='Path to xml dump')
-parser.add_argument('-triple', help='wiki triple file')
-parser.add_argument('-info', help='Path to infobox file')
-parser.add_argument('-result', help='result file')
-parser.add_argument('-comp', help='Path to result file which contains all counter information')
+parser = argparse.ArgumentParser()
+parser.add_argument('-xml', help='test')
+parser.add_argument('-c', '--crawler', help='triple file path')
+parser.add_argument('-info', help='Path to infobox file 697898 9')
+parser.add_argument('-comp', help='Path to result file which contains all counter information 897987897')
+parser.add_argument('-r', '--result', help='result file')
 args = parser.parse_args()
 
 wikixml_path = args.xml
 infobox_path = args.info
-wikitriple_path = args.triple
+wikitriple_path = args.crawler
 result_path = args.result
 comp_path = args.comp
 
