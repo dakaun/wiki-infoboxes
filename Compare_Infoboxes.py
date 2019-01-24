@@ -27,8 +27,8 @@ parser = argparse.ArgumentParser(
                 'which contain a link + csv file which counts entites')
 parser.add_argument('-xml', help='Path to xml dump')
 parser.add_argument('-info', help='Path to infobox file')
-parser.add_argument('-wiki_triple', help='Path to wiki_triple file (result from wiki_crawler')
-parser.add_argument('-result', help='Path to result file which contains all infobox information')
+parser.add_argument('-triple', help='Path to wiki_triple file (result from wiki_crawler')
+parser.add_argument('-res', help='Path to result file which contains all infobox information')
 parser.add_argument('-comp', help='Path to result file which contains all counter information')
 args = parser.parse_args()
 
