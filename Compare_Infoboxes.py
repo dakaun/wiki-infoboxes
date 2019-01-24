@@ -32,9 +32,9 @@ parser.add_argument('-result', help='result file')
 parser.add_argument('-comp', help='Path to result file which contains all counter information')
 args = parser.parse_args()
 
-wikixml_path = args.xml_path
-infobox_path = args.info_path
-wikitriple_path = args.wiki_triple
+wikixml_path = args.xml
+infobox_path = args.info
+wikitriple_path = args.triple
 result_path = args.result
 comp_path = args.comp
 
