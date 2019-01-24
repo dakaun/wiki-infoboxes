@@ -103,4 +103,3 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
             infobox_f_line = infobox_f.readline()
 df.to_csv(result_path, sep=';', index=False)
 df_comp.to_csv(comp_path, sep=';', index=False)  # todo encoding anpassen
-print(f'Time Tracking: {time.time()-start}')
