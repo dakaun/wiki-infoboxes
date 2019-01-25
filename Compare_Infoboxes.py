@@ -21,7 +21,6 @@ def get_article_triple_file(article_name, t_file):
             t_line = t_file.readline()
     return article_as_string
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-xml', help='test')
 parser.add_argument('-c', '--crawler', help='triple file path')
