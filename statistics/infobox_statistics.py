@@ -30,16 +30,16 @@ amount_links = data_total['amount_links'].sum()
 amount_properties = data_total['amount_properties'].sum()
 #amount_values = data_total['amount_values'].sum()
 
-print('Amount Properties: {}'.format(amount_properties)
-print('Amount Values: {}'.format(amount_entities)
+print('Amount Properties: {}'.format(amount_properties))
+print('Amount Values: {}'.format(amount_entites))
 print('Amount Links: {}'.format(amount_links))
 print('Amount Links which appear in the articles {}'.format(amount_link_article_match))
 
 print('The Infobox Templates contain {amount_properties} properties'.format(amount_properties))
-print('{round(amount_entites/amount_properties *100, 2)} % of these properties do have a value. (entities/properties)))
-print('{round(amount_links/amount_entites *100, 2)} % of those values are links. (links/entities)')
-print('{round(amount_link_article_match/amount_links *100, 2)} % of those links appear in the article. (match/link)')
-print('{round(amount_link_article_match/amount_entites*100, 2)} % of all values are links which appear in the article, too. (match/entities)')
+print('{} % of these properties do have a value. (entities/properties))'.format(round(amount_entites/amount_properties *100, 2)))
+print('{} % of those values are links. (links/entities)'.format(round(amount_links/amount_entites *100, 2)))
+print('{} % of those links appear in the article. (match/link)'.format(round(amount_link_article_match/amount_links *100, 2)))
+print('{} % of all values are links which appear in the article, too. (match/entities)'.format(round(amount_link_article_match/amount_entites*100, 2)))
 
 #infobox
 column_link_match = data_total["amount_link_article_match"]
