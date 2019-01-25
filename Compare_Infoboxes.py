@@ -22,19 +22,19 @@ def get_article_triple_file(article_name, t_file):
     return article_as_string
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-xml', help='test')
-parser.add_argument('-c', '--crawler', help='triple file path')
-parser.add_argument('-info', help='Path to infobox file 697898 9')
-parser.add_argument('-comp', help='Path to result file which contains all counter information 897987897')
-parser.add_argument('-r', '--result', help='result file')
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument('-xml', help='test')
+# parser.add_argument('-c', '--crawler', help='triple file path')
+# parser.add_argument('-info', help='Path to infobox file 697898 9')
+# parser.add_argument('-comp', help='Path to result file which contains all counter information 897987897')
+# parser.add_argument('-r', '--result', help='result file')
+# args = parser.parse_args()
 
-wikixml_path = args.xml
-infobox_path = args.info
-wikitriple_path = args.crawler
-result_path = args.result
-comp_path = args.comp
+wikixml_path = '../../wikipedia20180401/wikipart_5/enwiki_1000069.xml' # args.xml
+infobox_path = '../../infoboxes/infobox_file/res/2501_infobox_1000069.txt' # args.info
+wikitriple_path = '../../wikipedia20180401/RES_1000069/wiki_triples.txt' # args.crawler
+result_path = '../../infoboxes/result_infoboxes/res/2501_result_1000069.csv' # args.result
+comp_path = '../../infoboxes/comp_infoboxes/res/2501_comp_1000069.csv' # args.comp
 
 start = time.time()
 # # # # PATHES:
