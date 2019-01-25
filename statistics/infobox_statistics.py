@@ -35,7 +35,7 @@ print('Amount Values: {}'.format(amount_entites))
 print('Amount Links: {}'.format(amount_links))
 print('Amount Links which appear in the articles {}'.format(amount_link_article_match))
 
-print('The Infobox Templates contain {amount_properties} properties'.format(amount_properties))
+print('The Infobox Templates contain {} properties'.format(amount_properties))
 print('{} % of these properties do have a value. (entities/properties))'.format(round(amount_entites/amount_properties *100, 2)))
 print('{} % of those values are links. (links/entities)'.format(round(amount_links/amount_entites *100, 2)))
 print('{} % of those links appear in the article. (match/link)'.format(round(amount_link_article_match/amount_links *100, 2)))
@@ -44,6 +44,6 @@ print('{} % of all values are links which appear in the article, too. (match/ent
 #infobox
 column_link_match = data_total["amount_link_article_match"]
 column_link_match = column_link_match.replace(0, pd.np.nan).dropna()
-print("There are " + str(column_link_match) + " infoboxes with links, which appear in the articles too.")
+print("There are " + str(column_link_match.shape) + " infoboxes with links, which appear in the articles too.")
 print("Mean: " + str(column_link_match.mean()))
 
