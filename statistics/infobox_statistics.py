@@ -8,20 +8,31 @@ import argparse
 # path= '../../../comp/1216_info_comp.csv'
 
 data1 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/1801_comp_918596.csv', sep=';')
-data2 = pd.read_csv('../../../infboxes/comp_infoboxes/res/2012_comp_small.csv', sep=';')
-# data3 = pd.read_csv('../data/comp_infobox/res/2012_comp_small.csv', sep=';')
+data2 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2012_comp_small.csv', sep=';')
+data3 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_1000069.csv', sep=';')
+data4 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_100910.csv', sep=';')
+data5 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_30371.csv', sep=';')
+data6 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_400021.csv', sep=';')
+data7 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_800146.csv', sep=';')
+data8 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_2001485.csv', sep=';')
 
 print(data1.shape)
 print(data2.shape)
-# print(data3.shape)
+print(data3.shape)
+print(data4.shape)
+print(data5.shape)
+print(data6.shape)
+print(data7.shape)
+print(data8.shape)
 
 # concat total df
-frame  = [data1, data2] # add data
-data_total = pd.concat(frame, axis=0, ignore_index=True)
+frame  = [data1, data2, data3, data4, data5, data6, data7, data8] # add data
+data_total = pd.concat(frame, ignore_index=True, sort=True)
 
-print("TOTAL DATA SHAPE: " + data1.shape)
+print("TOTAL DATA SHAPE: " + str(data_total.shape))
 # data_total:
 print("There are " + str(data_total['article'].nunique()) +" unique articles.")
+print("There are " + str(data_total['amount_properties'].replace(0, pd.np.nan).dropna().shape[0]) + " articles with infoboxes")
 data_total = data_total[data_total['article'].duplicated()!=True] # todo how many infoboxes are there
 
 amount_entites = data_total['amount_entities'].sum()
@@ -44,6 +55,6 @@ print('{} % of all values are links which appear in the article, too. (match/ent
 #infobox
 column_link_match = data_total["amount_link_article_match"]
 column_link_match = column_link_match.replace(0, pd.np.nan).dropna()
-print("There are " + str(column_link_match.shape) + " infoboxes with links, which appear in the articles too.")
+print("There are " + str(column_link_match.shape[0]) + " infoboxes with links, which appear in the articles too.")
 print("Mean: " + str(column_link_match.mean()))
 
