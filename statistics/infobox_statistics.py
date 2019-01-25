@@ -7,16 +7,16 @@ import argparse
 #path = args.comp_path
 # path= '../../../comp/1216_info_comp.csv'
 
-data1 = pd.read_csv('../data/comp_infobox/res/124_comp.csv', sep=';')
-data2 = pd.read_csv('../data/comp_infobox/res/1801_comp_918596.csv', sep=';')
-data3 = pd.read_csv('../data/comp_infobox/res/2012_comp_small.csv', sep=';')
+data1 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/1801_comp_918596.csv', sep=';')
+data2 = pd.read_csv('../../../infboxes/comp_infoboxes/res/2012_comp_small.csv', sep=';')
+# data3 = pd.read_csv('../data/comp_infobox/res/2012_comp_small.csv', sep=';')
 
 print(data1.shape)
 print(data2.shape)
-print(data3.shape)
+# print(data3.shape)
 
 # concat total df
-frame  = [data1, data2, data3] # add data
+frame  = [data1, data2] # add data
 data_total = pd.concat(frame, axis=0, ignore_index=True)
 
 print("TOTAL DATA SHAPE: " + data1.shape)
@@ -30,16 +30,16 @@ amount_links = data_total['amount_links'].sum()
 amount_properties = data_total['amount_properties'].sum()
 #amount_values = data_total['amount_values'].sum()
 
-print(f'Amount Properties: {amount_properties}')
-print(f'Amount Values: {amount_entites}')
-print(f'Amount Links: {amount_links}')
-print(f'Amount Links which appear in the articles {amount_link_article_match}')
+print('Amount Properties: {}'.format(amount_properties)
+print('Amount Values: {}'.format(amount_entities)
+print('Amount Links: {}'.format(amount_links))
+print('Amount Links which appear in the articles {}'.format(amount_link_article_match))
 
-print(f'The Infobox Templates contain {amount_properties} properties')
-print(f'{round(amount_entites/amount_properties *100, 2)} % of these properties do have a value. (entities/properties)')
-print(f'{round(amount_links/amount_entites *100, 2)} % of those values are links. (links/entities)')
-print(f'{round(amount_link_article_match/amount_links *100, 2)} % of those links appear in the article. (match/link)')
-print(f'{round(amount_link_article_match/amount_entites*100, 2)} % of all values are links which appear in the article, too. (match/entities)')
+print('The Infobox Templates contain {amount_properties} properties'.format(amount_properties))
+print('{round(amount_entites/amount_properties *100, 2)} % of these properties do have a value. (entities/properties)))
+print('{round(amount_links/amount_entites *100, 2)} % of those values are links. (links/entities)')
+print('{round(amount_link_article_match/amount_links *100, 2)} % of those links appear in the article. (match/link)')
+print('{round(amount_link_article_match/amount_entites*100, 2)} % of all values are links which appear in the article, too. (match/entities)')
 
 #infobox
 column_link_match = data_total["amount_link_article_match"]
