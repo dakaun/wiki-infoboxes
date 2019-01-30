@@ -15,26 +15,29 @@ data5 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_30371.csv',
 data6 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_400021.csv', sep=';')
 data7 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_800146.csv', sep=';')
 data8 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_2001485.csv', sep=';')
+data9 = pd.read_csv('../../../infoboxes/comp_infoboxes/res/2501_comp_2001655.csv', sep=';')
 
 print(data1.shape)
-print(data2.shape)
 print(data3.shape)
 print(data4.shape)
 print(data5.shape)
 print(data6.shape)
 print(data7.shape)
 print(data8.shape)
+print(data9.shape)
 
 # concat total df
-frame  = [data1, data2, data3, data4, data5, data6, data7, data8] # add data
+frame  = [data1, data3, data4, data5, data6, data7, data8, data9] # add data
 data_total = pd.concat(frame, ignore_index=True, sort=True)
+
+print(data_total.columns)
 
 print("TOTAL DATA SHAPE: " + str(data_total.shape))
 # data_total:
 print("There are " + str(data_total['article'].nunique()) +" unique articles.")
-print("There are " + str(data_total['amount_properties'].replace(0, pd.np.nan).dropna().shape[0]) + " articles with infoboxes")
+# print("There are " + str(data_total['amount_properties'].replace(0, pd.np.nan).dropna().shape[0]) + " articles with infoboxes")
 data_total = data_total[data_total['article'].duplicated()!=True] # todo how many infoboxes are there
-
+print("There are " + str(data_total['amount_properties'].replace(0, pd.np.nan).dropna().shape[0]) + " articles with infoboxes")
 amount_entites = data_total['amount_entities'].sum()
 amount_link_article_match = data_total['amount_link_article_match'].sum()
 amount_links = data_total['amount_links'].sum()
@@ -57,4 +60,5 @@ column_link_match = data_total["amount_link_article_match"]
 column_link_match = column_link_match.replace(0, pd.np.nan).dropna()
 print("There are " + str(column_link_match.shape[0]) + " infoboxes with links, which appear in the articles too.")
 print("Mean: " + str(column_link_match.mean()))
+
 
