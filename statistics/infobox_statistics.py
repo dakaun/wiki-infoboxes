@@ -33,7 +33,7 @@ print("TOTAL DATA SHAPE: " + str(data_total.shape))
 # data_total:
 print("There are " + str(data_total['article'].nunique()) +" unique articles.")
 print("There are " + str(data_total['amount_properties'].replace(0, pd.np.nan).dropna().shape[0]) + " articles with infoboxes")
-data_total = data_total[data_total['article'].duplicated()!=True] # todo how many infoboxes are there
+data_total = data_total[data_total['article'].duplicated()!=True]
 
 amount_entites = data_total['amount_entities'].sum()
 amount_link_article_match = data_total['amount_link_article_match'].sum()
