@@ -37,6 +37,13 @@ def extract_title(article):
 
 
 def parse_infobox(infobox, title, infofile):
+    '''
+    parses each infobox.
+    :param infobox: the infobox in string form the article
+    :param title: the title of the article
+    :param infofile: the file in which the result should be written
+    :return:
+    '''
     infobox_value_counter = 0
     link_counter = 0
     amount_info_values = 0
@@ -98,21 +105,3 @@ def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
     print('-- Infoboxes extracted and saved in infobox_file')
     return df
 
-
-
-if __name__ == '__main__':
-    wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_short.txt'
-    comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/comp/2001_comp.csv'
-    infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/2001_infobox.csv'
-
-    df = create_infobox_dic(wikixml_path, comp_path)
-    df.to_csv(infobox_path, sep=';', index=False)
-
-
-    # df_comp = pd.DataFrame(
-    #    columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
-    #path, df = create_infobox_dic(
-    #    'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt',
-    #    'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/infobox_file/' + str(
-    #        datetime.datetime.now().month) + str(datetime.datetime.now().day) + 'infobox.txt', df_comp)
-    #print(df)
