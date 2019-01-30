@@ -50,7 +50,7 @@ def parse_infobox(infobox, title, infofile):
     for i in range(0, amount_info_values):
         # counts all infobox names with content (not only those which contain a link)
         if re.match('[^\\n]', str(infobox[0].params[
-                                      i].value)) is not None:  # todo could be enhanced by searching for any charachter except \n, }},|
+                                      i].value)) is not None:
             infobox_value_counter += 1
         if '[[' in infobox[0].params[i].value:
             link_counter += 1
@@ -60,16 +60,22 @@ def parse_infobox(infobox, title, infofile):
             name = name.replace('\n', ' ')
             value = value.replace('\n', ' ')
             entity_list.update({name: value})
-            #df = df.append({'article_title': title, 'infobox_property': name, 'infobox_value': value}, ignore_index=True)
     infobox_dic.update({title: entity_list})
     infofile.write(str(infobox_dic) + '\n')
     return title, amount_info_values, infobox_value_counter, link_counter
 
 
 def create_infobox_dic(wikiarticle_path, infobox_path, comp_path):
+    '''
+    This files runs through all the articles from wikipedia to extract each infobox. The infobox will be written to a file
+    in a dictionary format.
+    :param wikiarticle_path: the path to the files which contains the wikipedia articles
+    :param infobox_path: the path to the location where the file with the infoboxes should be saved
+    :param comp_path: the path to the location where the file with the numbers should be saved
+    :return:
+    '''
     df = pd.DataFrame(
         columns=['article', 'amount_properties', 'amount_entities', 'amount_links', 'amount_link_article_match'])
-    # df_info = pd.DataFrame(columns=['article_title', 'infobox_property', 'infobox_value'])
     article = ""
     infobox_file = open(infobox_path, 'w+')
     print('-- Extracting infoboxes')

@@ -37,21 +37,15 @@ result_path = '../../infoboxes/result_infoboxes/res/2501_result_1000069.csv' # a
 comp_path = '../../infoboxes/comp_infoboxes/res/2501_comp_1000069.csv' # args.comp
 
 start = time.time()
-# # # # PATHES:
-# wikixml_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/data/wiki_dump_long.txt'
-# infobox_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/infobox_file/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_infobox.txt'
-#
-# wikitriple_path = r'C:\Users\danielak\Desktop\Dokumente Daniela\UNI\FIZ\Second_Task\test_wiki_crawler\longer\wiki_triples.txt'
-# result_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/result_infobox/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_result_infobox.csv'
-# comp_path = 'C:/Users/danielak/Desktop/Dokumente Daniela/UNI/FIZ/Second_Task/wiki-infoboxes/wiki-infoboxes/data/comp_infobox/' + str(
-#     datetime.datetime.now().month) + str(datetime.datetime.now().day) + '_comp.csv'
+'''
+start running this script: it starts with extracting the infoboxes from the articles (in Extract_Infobox.create_infobox_dic)
+and gives back a file, which contains the infobox information about each article.
+In the following script the file with the infobox information from the previous method is compared with the file from last
+semester which contains all links from each article. The matches of both files will be written to a result file.
+Furthermore another csv file is written which contains the counters for the articles to compute the statistics.
+'''
 
-
-# python Compare_Infoboxes.py -xml_path ../../data/wiki_dump_long.txt -info_path data/infobox_2812.txt -wiki_triple ../../test_wiki_ctawler/longer/wiki_triples.txt -result data/result_infobox/result_infobox_2812.csv -comp data/comp_infobox/comp_2812.csv
 df_comp = Extract_Infobox.create_infobox_dic(wikixml_path, infobox_path, comp_path)
-# df_comp = pd.read_csv(comp_path, encoding='cp65001')  # TODO fix pandas.errors.ParserError: Error tokenizing data. C error: Expected 1 fields in line 7, saw 2
 with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
     with open(infobox_path) as infobox_f:
         df = pd.DataFrame(columns=['Article', 'Infobox_property', 'Link',
@@ -100,4 +94,4 @@ with open(wikitriple_path) as triple_f:  # , encoding='cp65001'
             df_comp.loc[index_co, 'amount_link_article_match'] = value_link_match_counter
             infobox_f_line = infobox_f.readline()
 df.to_csv(result_path, sep=';', index=False)
-df_comp.to_csv(comp_path, sep=';', index=False)  # todo encoding anpassen
+df_comp.to_csv(comp_path, sep=';', index=False)
